@@ -5,7 +5,7 @@ Instalar todas as dependencias indicada pelo package.json
 Rodar o projeto com nodemon
 ### nodemon app.js
 
-
+Readme atualizado
 
 SEQUENCIA PARA CRIAR O PROJETO
 Criar o arquivo package
