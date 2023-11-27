@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Listar Usuários</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <style>
+        .minha-tabela {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            /* Ajuste conforme necessário */
+        }
+
+        .minha-tabela th,
+        .minha-tabela td {
+            border: 1px solid #111111;
+            padding: 8px;
+            text-align: left;
+        }
+
+        .minha-tabela th {
+            background-color: #706d6d;
+        }
+        /* Estilos gerais do formulário */
+.registration-form {
+  max-width: 400px;
+  margin: left;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Estilos para as etiquetas e entradas do formulário */
+.registration-form label {
+  display: block;
+  margin-bottom: 10px;
+}
+
+.registration-form span {
+  font-weight: bold;
+  display: block;
+  margin-bottom: 5px;
+}
+
+.registration-form input {
+  width: 100%;
+  padding: 8px;
+  box-sizing: border-box;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+    </style>
+
+</head>
+
+<body>
+
+    <header>
+        <h1>Cadastro</h1>
+    </header>
+    <main>
+        <form id="cadastroForm" class="registration-form">
+            <label for="name">
+                <span>Nome</span>
+                <input type="text" id="name" name="name" required>
+            </label>
+
+            <label for="email">
+                <span>E-mail</span>
+                <input type="email" id="email" name="email" required>
+            </label>
+            <button type="button" class="btn btn-primary" onclick="cadastrar()">Cadastrar</button>
+            <div id="mensagem"></div>
+        </form>
+    </main>
+
+    <script>
+        async function cadastrar() {
+            const nome = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+
+            try {
+                const response = await fetch('/adm', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ name: nome, email: email }),
+                });
+
+                if (response.ok) {
+                    const result = await response.text();
+                    document.getElementById('mensagem').innerHTML = result;
+                    alert('Cadastrado com sucesso!');
+                    // Atualizar automaticamente após o cadastro
+                    location.reload();
+
+                } else {
+                    throw new Error('Erro ao cadastrar.');
+
+                }
+            } catch (error) {
+
+                document.getElementById('mensagem').innerHTML = error.message;
+            }
+        }
+    </script>
+    <table class="minha-tabela">
+        <thead>
+            <tr>
+                <th><strong>ID</strong></th>
+                <th><strong>NOME</strong></th>
+                <th><strong>EMAIL</strong></th>
+                <th><strong>AÇÃO</strong></th>
+            </tr>
+        </thead>
+        <tbody>
+            <% usuarios.forEach(usuario=> { %>
+                <tr>
+                    <td>
+                        <%= usuario.id %>
+                    </td>
+                    <td>
+                        <%= usuario.name %>
+                    </td>
+                    <td>
+                        <%= usuario.email %>
+                    </td>
+                    <td>
+                        <button class="btn btn-warning"
+                            onclick="window.location.href='/editar/<%= usuario.id %>'">Editar</button>
+                        <button class="btn btn-danger" onclick="excluirUsuario('<%= usuario.id %>')">Excluir</button>
+                    </td>
+                </tr>
+                <% }); %>
+        </tbody>
+    </table>
+    </script>
+
+    <script>
+        // Função para confirmar e enviar a solicitação de exclusão
+        function excluirUsuario(userId) {
+            if (confirm('Tem certeza que deseja excluir este usuário?')) {
+                // Envia a solicitação DELETE para o servidor
+                fetch(`/deletar/${userId}`, {
+                    method: 'DELETE'
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.erro) {
+                            alert('Erro ao excluir o usuário.');
+                        } else {
+                            alert('Excluído com sucesso!');
+                            // Recarrega a página após a exclusão bem-sucedida
+                            location.reload();
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Erro:', error);
+                        alert('Erro ao excluir o usuário.');
+                    });
+            }
+        }
+    </script>
+</body>
+
+</html>
